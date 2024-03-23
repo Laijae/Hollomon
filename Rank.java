@@ -1,4 +1,4 @@
 public enum Rank {
-    UNIQUE, RARE, UNCOMMONN, COMMON
+    UNIQUE, RARE, UNCOMMONN, COMMON 
 }
 

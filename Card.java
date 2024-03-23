@@ -32,7 +32,6 @@ public class Card implements Comparable<Card>{
 
         //If the name is the same, compare the id of the cards
         return Long.compare(this.id, card.getId());
-
     }
 
     @Override
