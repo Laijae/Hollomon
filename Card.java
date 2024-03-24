@@ -7,7 +7,7 @@ public class Card implements Comparable<Card>{
     private Rank rank;
     private long price;
 
-    public Card(long id, String name, Rank rank, long price) {
+    public Card(long id, String name, Rank rank) {
         this.id = id;
         this.name = name;
         this.rank = rank;
@@ -31,7 +31,15 @@ public class Card implements Comparable<Card>{
         }
 
         //If the name is the same, compare the id of the cards
-        return Long.compare(this.id, card.getId());
+        int idComparison = Long.compare(this.id, card.getId());
+        //If the id is not the same return the comparison
+        if(idComparison != 0){
+            return idComparison;
+        }
+
+        //if the rank, name and id are the same return 0
+        return 0;
+
     }
 
     @Override
