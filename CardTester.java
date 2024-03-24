@@ -46,6 +46,9 @@ public class CardTester {
         cardSet.add(card4);
         cardSet.add(card5);
         cardSet.add(card6);
+        cardSet.add(card7);
+        cardSet.add(card8);
+        
 
         //cards should be printed in order defined by compareTo
         System.out.println("Cards in the set should be ordered: ");
@@ -62,6 +65,8 @@ public class CardTester {
         cardTree.add(card4);
         cardTree.add(card5);
         cardTree.add(card6);
+        cardTree.add(card7);
+        cardTree.add(card8);
 
         //cards should be printed in order defined by compareTo
         System.out.println("Cards in the tree should be ordered: ");
