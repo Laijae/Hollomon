@@ -14,6 +14,14 @@ public class Card implements Comparable<Card>{
         this.price = 0;
     }
 
+    //constructor with price
+    public Card(long id, String name, Rank rank, long price) {
+        this.id = id;
+        this.name = name;
+        this.rank = rank;
+        this.price = price;
+    }
+
     @Override
     public int compareTo(Card card) {
         //First compare the rank of the cards, (ranks are taken from the order they are declared in the Rank enum)
@@ -85,6 +93,10 @@ public class Card implements Comparable<Card>{
 
     public long getPrice() {
         return price;
+    }
+
+    public void setPrice(long price) {
+        this.price = price;
     }
 
 
