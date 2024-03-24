@@ -45,35 +45,27 @@ public class CardInputStream extends InputStream{
 
     public Card readCard(){
         try{
-            //expecting tagline "CARD"
-            if (!reader.readLine().equals("CARD")){
-                throw new IOException("expecting CARD tagline");
+            //Check tagline
+            String tagline = readResponse();
+            if(tagline.equals("OK")){
+                return null;
+            }
+            else if(!tagline.equals("CARD")){ //if tagline is not CARD or OK, throw an exception
+                throw new IOException("error reading card: expected CARD tagline, got " + tagline);
             }
 
-            //read the id
-            long id = Long.parseLong(reader.readLine());
-
-            //read the name
-            String name = reader.readLine();
-
-            //read the rank
-            Rank rank = Rank.valueOf(reader.readLine());
-
-            //read price
-            long price = Long.parseLong(reader.readLine());
-
-            //create card object
-            Card card = new Card(id, name, rank, price);
-         
-            return card;
-            
+            //read card details
+            long id = Long.parseLong(readResponse());
+            String name = readResponse();
+            Rank rank = Rank.valueOf(readResponse());
+            long price = Long.parseLong(readResponse());
+            //create and send
+            return new Card(id, name, rank, price);
         }
         catch(IOException e){
             System.out.println("Error reading card: " + e.getMessage());
             return null;
         }
-
-
     }
 
 }
