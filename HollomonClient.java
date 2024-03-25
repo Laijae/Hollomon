@@ -9,6 +9,8 @@ public class HollomonClient {
     private Socket sock;
     private BufferedReader reader;
     private BufferedWriter writer;
+    private CardInputStream cardInputStream;
+    
 
 
     public HollomonClient (String server, int port) {
@@ -22,8 +24,9 @@ public class HollomonClient {
             this.sock = new Socket(server, port);
 
             //Create a reader and writer to the server
-            reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            writer = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(this.sock.getInputStream()));
+            writer = new BufferedWriter(new OutputStreamWriter(this.sock.getOutputStream()));
+            cardInputStream = new CardInputStream(this.sock.getInputStream());
 
         }
         catch(IOException e){
@@ -33,8 +36,9 @@ public class HollomonClient {
     }
 
     public List<Card> login(String username, String password) {
-        //connect to server
-        connect();
+        //ensure connected to server
+        ensureConnected();
+
 
         //send login message
         try{
@@ -47,7 +51,7 @@ public class HollomonClient {
 
             //Check for successful login response
             if(response.equals("User " + username + " logged in successfully.")){
-                CardInputStream cardInputStream = new CardInputStream(sock.getInputStream());
+                
                 List<Card> cards = new ArrayList<>();
 
                 //read the cards
@@ -58,15 +62,12 @@ public class HollomonClient {
                     }
                     cards.add(card);
                 }
-                
-
-                cardInputStream.close();
 
                 //ordering the cards
                 Collections.sort(cards);
 
                 return cards;
-                
+
             }
             else{
                 System.out.println("Error logging in: " + response);
@@ -79,6 +80,8 @@ public class HollomonClient {
             System.out.println("Error sending login message: " + e.getMessage());
             return null;
         }
+        
+        
 
     }
 
@@ -95,12 +98,87 @@ public class HollomonClient {
             if(writer != null){
                 writer.close();
             }
+            if(cardInputStream != null){
+                cardInputStream.close();
+            }
+
         }
         catch(IOException e){
             System.out.println("Error closing connection: " + e.getMessage());
         }
 
     }
+
+    public void ensureConnected() {
+        if(sock == null || !sock.isConnected() || sock.isClosed()){
+            connect();
+        }
+    }
+
+    public long getCredits() {
+        //ensure connected to server
+        ensureConnected();
+
+        try{
+            //send the command: CREDITS
+            writer.write("CREDITS" + "\n");
+            writer.flush();
+
+            //read the response
+            String credits = reader.readLine();
+            //read the tagline
+            String tagline = reader.readLine();
+
+            //check for successful response
+            if(tagline.equals("OK")){
+                return Long.parseLong(credits);
+            }
+            else{
+                throw new IOException("Error: incorrect tagline for CREDITS command: " + tagline);
+            }
+
+        }
+        catch(IOException e){
+            System.out.println("Error getting credits: " + e.getMessage());
+            return -1;
+        }
+        
+
+    }
+
+    public List<Card> getCards() {
+        //ensure connected to server
+        ensureConnected();
+
+        try{
+            //send the command: CARDS
+            writer.write("CARDS" + "\n");
+            writer.flush();
+
+            List<Card> cards = new ArrayList<>();
+
+            //read the cards
+            while (true){
+                Card card = cardInputStream.readCard();
+                if(card == null){
+                    break;
+                }
+                cards.add(card);
+            }
+
+            //ordering the cards
+            Collections.sort(cards);
+
+            return cards;
+            
+        }
+        catch (IOException e){
+            System.out.println("Error getting cards: " + e.getMessage());
+            return null;
+        }
+    }
+
+    
 
 
 }
